@@ -18,7 +18,10 @@ class App extends Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.searchQuery !== this.state.searchQuery) {
+    if (
+      prevState.searchQuery !== this.state.searchQuery ||
+      prevState.currentPage !== this.state.currentPage
+    ) {
       this.fetchImages();
     }
   }
@@ -27,11 +30,10 @@ class App extends Component {
     const { currentPage, searchQuery } = this.state;
     getImages(searchQuery, currentPage)
       .then(images => {
-        console.log(images.hits);
         this.setState(prevState => ({
           images: [...prevState.images, ...images.hits],
           isShowLoadmore:
-            prevState.currentPage < Math.ceil(images.totalHits / 12),
+            this.state.currentPage < Math.ceil(images.totalHits / 12),
           status: 'resolved',
         }));
       })
@@ -39,8 +41,12 @@ class App extends Component {
   };
 
   createSearchQuerry = searchQuery => {
-    this.setState({ searchQuery });
-    this.setState({ images: [], currentPage: 1, status: 'pending' });
+    this.setState({
+      searchQuery,
+      images: [],
+      currentPage: 1,
+      status: 'pending',
+    });
   };
 
   toggleModal = () => {
@@ -55,10 +61,7 @@ class App extends Component {
     this.setState(
       prevState => ({
         currentPage: prevState.currentPage + 1,
-      }),
-      () => {
-        this.fetchImages();
-      }
+      })
     );
   };
 
