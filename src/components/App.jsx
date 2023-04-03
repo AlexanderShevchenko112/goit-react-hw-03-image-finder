@@ -14,11 +14,11 @@ class App extends Component {
     status: 'idle',
     selectedImage: null,
     isShowModal: false,
+    isShowLoadmore: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.searchQuery !== this.state.searchQuery) {
-      this.setState({ images: [], currentPage: 1, status: 'pending' });
       this.fetchImages();
     }
   }
@@ -30,7 +30,8 @@ class App extends Component {
         console.log(images.hits);
         this.setState(prevState => ({
           images: [...prevState.images, ...images.hits],
-          currentPage: prevState.currentPage + 1,
+          isShowLoadmore:
+            prevState.currentPage < Math.ceil(images.totalHits / 12),
           status: 'resolved',
         }));
       })
@@ -39,6 +40,7 @@ class App extends Component {
 
   createSearchQuerry = searchQuery => {
     this.setState({ searchQuery });
+    this.setState({ images: [], currentPage: 1, status: 'pending' });
   };
 
   toggleModal = () => {
@@ -49,9 +51,11 @@ class App extends Component {
     this.setState({ selectedImage: largeImageURL, isShowModal: true });
   };
 
-  handleLoadMore = () => {
+  handleLoadmore = () => {
     this.setState(
-      prevState => ({ currentPage: prevState.currentPage + 1 }),
+      prevState => ({
+        currentPage: prevState.currentPage + 1,
+      }),
       () => {
         this.fetchImages();
       }
@@ -77,7 +81,9 @@ class App extends Component {
             {images.length > 0 ? (
               <>
                 <ImageGallery images={images} onSelect={this.onSelectImage} />
-                <Button onClick={this.handleLoadMore}>Load more</Button>
+                {this.state.isShowLoadmore && (
+                  <Button onClick={this.handleLoadmore}>Load more</Button>
+                )}
               </>
             ) : (
               <h2 className={css.appHeaders}>
