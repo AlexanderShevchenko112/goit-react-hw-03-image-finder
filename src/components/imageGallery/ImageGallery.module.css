@@ -1,0 +1,11 @@
+.imageGallery {
+  display: flex;
+  flex-wrap: wrap;
+  /* max-width: calc(90vw - 40px); */
+  gap: 20px;
+  margin-top: 50px;
+  margin-bottom: 0;
+  padding: 0;
+  list-style: none;
+  justify-content: center;
+}
